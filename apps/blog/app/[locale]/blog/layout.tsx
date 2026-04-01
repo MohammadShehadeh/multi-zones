@@ -23,9 +23,21 @@ export default async function BlogLayout({
 
   return (
     <html lang={locale} dir={isRtl(locale as Locale) ? "rtl" : "ltr"}>
-      <body>
+      <body style={{ margin: 0, fontFamily: "sans-serif" }}>
         <NextIntlClientProvider messages={messages}>
-          <main>{children}</main>
+          <nav style={{ display: "flex", gap: "1rem", padding: "1rem", borderBottom: "1px solid #eee", background: "#f0fdf4" }}>
+            <a href={`/${locale}`}>🏠 Home</a>
+            <a href={`/${locale}/docs`}>📖 Docs</a>
+            <a href={`/${locale}/blog`} style={{ fontWeight: "bold" }}>✍️ Blog</a>
+            <span style={{ marginLeft: "auto" }}>
+              {locales.map((l) => (
+                <a key={l} href={`/${l}/blog`} style={{ marginLeft: "0.5rem", fontWeight: l === locale ? "bold" : "normal" }}>
+                  {l.toUpperCase()}
+                </a>
+              ))}
+            </span>
+          </nav>
+          <main style={{ padding: "2rem" }}>{children}</main>
         </NextIntlClientProvider>
       </body>
     </html>

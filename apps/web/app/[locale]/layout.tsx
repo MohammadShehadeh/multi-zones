@@ -56,12 +56,20 @@ export default async function RootLayout({
 			</head>
 			<body>
 				<NextIntlClientProvider messages={messages}>
+					<nav style={{ display: 'flex', gap: '1rem', padding: '1rem', borderBottom: '1px solid #eee', background: '#f9f9f9' }}>
+						<a href={`/${locale}`} style={{ fontWeight: 'bold' }}>🏠 Home</a>
+						<a href={`/${locale}/about`}>About</a>
+						<a href={`/${locale}/docs`}>Docs</a>
+						<a href={`/${locale}/blog`}>Blog</a>
+						<span style={{ marginLeft: 'auto' }}>
+							{locales.map((l) => (
+								<a key={l} href={`/${l}`} style={{ marginLeft: '0.5rem', fontWeight: l === locale ? 'bold' : 'normal' }}>
+									{l.toUpperCase()}
+								</a>
+							))}
+						</span>
+					</nav>
 					<main>
-						<nav className='flex gap-2'>
-							<a href='/'>Home</a>
-							<a href='/docs'>Docs</a>
-							<a href='/blog'>Blog</a>
-						</nav>
 						{children}
 					</main>
 				</NextIntlClientProvider>

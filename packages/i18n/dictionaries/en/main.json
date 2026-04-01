@@ -1,10 +1,10 @@
 {
   "home": {
     "title": "Welcome",
-    "description": "Welcome to our site"
+    "description": "Welcome to our multi-zone site"
   },
   "about": {
     "title": "About",
-    "description": "About our site"
+    "description": "This is the about page, served by the web (main) zone."
   }
 }

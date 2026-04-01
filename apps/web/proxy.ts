@@ -5,9 +5,13 @@ const i18nMiddleware = createI18nMiddleware();
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const zonePattern = /^\/(en|ar)\/(docs|blog)(\/|$)/;
 
-  if (zonePattern.test(pathname)) {
+  // Skip locale handling for zone API routes (no locale in URL)
+  const zoneApiPattern = /^\/(docs|blog)\/api(\/|$)/;
+  // Skip locale handling for locale-prefixed zone routes (rewrite handles them)
+  const zonePrefixedPattern = /^\/(en|ar)\/(docs|blog)(\/|$)/;
+
+  if (zoneApiPattern.test(pathname) || zonePrefixedPattern.test(pathname)) {
     return;
   }
 
@@ -15,5 +19,14 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)" ],
+  matcher: [
+    /*
+     * Match all request paths except:
+     * - api routes
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon and common image extensions
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|bmp|tiff|avif)$).*)',
+  ],
 };

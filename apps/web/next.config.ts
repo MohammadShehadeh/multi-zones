@@ -10,29 +10,31 @@ const nextConfig: NextConfig = {
 	async rewrites() {
 		return {
 			beforeFiles: [
+				// API routes — no locale prefix
 				{
-					source: '/docs',
-					destination: `${DOCS_URL}/ar/docs`,
+					source: "/docs/api/:path*",
+					destination: `${DOCS_URL}/api/:path*`,
 				},
 				{
-					source: '/:locale(en|ar)/docs',
+					source: "/blog/api/:path*",
+					destination: `${BLOG_URL}/api/:path*`,
+				},
+
+				// Locale-prefixed zone routes
+				{
+					source: "/:locale(en|ar)/docs",
 					destination: `${DOCS_URL}/:locale/docs`,
 				},
 				{
-					source: '/:locale(en|ar)/docs/:path*',
+					source: "/:locale(en|ar)/docs/:path*",
 					destination: `${DOCS_URL}/:locale/docs/:path*`,
 				},
-
 				{
-					source: '/blog',
-					destination: `${BLOG_URL}/ar/blog`,
-				},
-				{
-					source: '/:locale(en|ar)/blog',
+					source: "/:locale(en|ar)/blog",
 					destination: `${BLOG_URL}/:locale/blog`,
 				},
 				{
-					source: '/:locale(en|ar)/blog/:path*',
+					source: "/:locale(en|ar)/blog/:path*",
 					destination: `${BLOG_URL}/:locale/blog/:path*`,
 				},
 			],
