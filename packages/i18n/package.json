@@ -1,0 +1,18 @@
+{
+  "name": "@repo/i18n",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./config": "./src/config.ts",
+    "./middleware": "./src/middleware.ts",
+    "./navigation": "./src/navigation.ts",
+    "./request": "./src/request.ts"
+  },
+  "dependencies": {
+    "next-intl": "^4.1.0"
+  },
+  "peerDependencies": {
+    "next": "^15.0.0 || ^16.0.0"
+  }
+}

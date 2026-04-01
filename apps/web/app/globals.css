@@ -32,8 +32,23 @@ a {
   text-decoration: none;
 }
 
+main {
+  padding: 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
 .imgDark {
   display: none;
+}
+
+.flex {
+  display: flex;
+  gap: 1rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
 }
 
 @media (prefers-color-scheme: dark) {
