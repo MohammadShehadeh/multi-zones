@@ -9,8 +9,9 @@ export const config = {
      * - api routes
      * - _next/static (static files)
      * - _next/image (image optimization files)
+     * - docs-static (zone asset prefix)
      * - favicon and common image extensions
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|bmp|tiff|avif)$).*)',
+    '/((?!api|_next/static|_next/image|docs-static|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|bmp|tiff|avif)$).*)',
   ],
 };
