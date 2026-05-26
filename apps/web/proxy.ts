@@ -6,12 +6,18 @@ const i18nMiddleware = createI18nMiddleware();
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Skip locale handling for zone static assets (rewrite handles them)
+  const zoneStaticPattern = /^\/(docs|blog)-static(\/|$)/;
   // Skip locale handling for zone API routes (no locale in URL)
   const zoneApiPattern = /^\/(docs|blog)\/api(\/|$)/;
   // Skip locale handling for locale-prefixed zone routes (rewrite handles them)
   const zonePrefixedPattern = /^\/(en|ar)\/(docs|blog)(\/|$)/;
 
-  if (zoneApiPattern.test(pathname) || zonePrefixedPattern.test(pathname)) {
+  if (
+    zoneStaticPattern.test(pathname) ||
+    zoneApiPattern.test(pathname) ||
+    zonePrefixedPattern.test(pathname)
+  ) {
     return;
   }
 

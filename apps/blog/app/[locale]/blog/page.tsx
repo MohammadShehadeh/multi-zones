@@ -36,7 +36,7 @@ export default async function BlogIndexPage({
       <div style={{ background: "#f0fdf4", border: "1px solid #86efac", borderRadius: "8px", padding: "1rem", marginBottom: "1.5rem" }}>
         <p style={{ margin: 0, fontSize: "0.8rem", color: "#666" }}>Zone: <strong>blog</strong> · Port 3002 · Locale: <strong>{locale}</strong></p>
       </div>
-      <Image src={`${process.env.NEXT_PUBLIC_ZONE_URL || "http://localhost:3002"}/blog-hero.svg`} alt="Blog zone" width={400} height={200} unoptimized style={{ borderRadius: "8px", marginBottom: "1.5rem" }} />
+      <Image src="/blog-static/blog-hero.svg" alt="Blog zone" width={400} height={200} unoptimized style={{ borderRadius: "8px", marginBottom: "1.5rem" }} />
       <h1>{t("title")}</h1>
       <p>{t("description")}</p>
       <ul style={{ listStyle: "none", padding: 0 }}>

@@ -10,6 +10,16 @@ const nextConfig: NextConfig = {
 	async rewrites() {
 		return {
 			beforeFiles: [
+				// Static asset proxying
+				{
+					source: "/docs-static/:path+",
+					destination: `${DOCS_URL}/docs-static/:path+`,
+				},
+				{
+					source: "/blog-static/:path+",
+					destination: `${BLOG_URL}/blog-static/:path+`,
+				},
+
 				// API routes — no locale prefix
 				{
 					source: "/docs/api/:path*",
