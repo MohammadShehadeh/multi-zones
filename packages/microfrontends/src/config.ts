@@ -4,8 +4,6 @@ import { zonesConfigSchema, type ApplicationConfig } from './schema';
 
 interface ApplicationBase {
 	name: string;
-	host: string;
-	port: number;
 	url: string;
 }
 
@@ -30,6 +28,7 @@ export interface ZoneApplication extends ApplicationBase {
 /** Served on its own host (e.g. `dashboard.localhost:3003`), never proxied. */
 interface StandaloneApplication extends ApplicationBase {
 	kind: 'standalone';
+	host: string;
 }
 
 type Application = DefaultApplication | ZoneApplication | StandaloneApplication;
@@ -58,17 +57,16 @@ function resolveApplication(name: string, app: ApplicationConfig): Application {
 		overrideUrl ??
 		(isDevelopment ? `http://${host}:${port}` : app.production.url)
 	).replace(/\/$/, '');
-	const base = { name, host, port, url };
 
-	if (app.default) return { ...base, kind: 'default' };
+	if (app.default) return { name, url, kind: 'default' };
 	if (app.routing && app.assetPrefix) {
 		// A string path is forwarded unchanged
 		const routes = app.routing
 			.flatMap((group) => group.paths)
 			.map((path) => (typeof path === 'string' ? { source: path, destination: path } : path));
-		return { ...base, kind: 'zone', routes, assetPrefix: `/${app.assetPrefix}` };
+		return { name, url, kind: 'zone', routes, assetPrefix: `/${app.assetPrefix}` };
 	}
-	return { ...base, kind: 'standalone' };
+	return { name, url, kind: 'standalone', host };
 }
 
 function getApplications() {
