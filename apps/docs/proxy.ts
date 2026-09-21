@@ -5,7 +5,7 @@ import type { NextRequest } from 'next/server';
 const i18nMiddleware = createI18nMiddleware();
 
 export function proxy(request: NextRequest) {
-  // This zone's _next assets live under its assetPrefix (see zones.json)
+  // Zone assets (/<assetPrefix>/_next/...) must not get a locale redirect (see zones.json)
   if (isZoneAssetPath(request.nextUrl.pathname)) {
     return;
   }

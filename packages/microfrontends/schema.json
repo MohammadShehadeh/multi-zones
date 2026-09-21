@@ -19,7 +19,8 @@
           },
           "assetPrefix": {
             "description": "Path segment for this zone's _next assets and public files, e.g. \"docs-static\". Required with \"routing\".",
-            "type": "string"
+            "type": "string",
+            "pattern": "^[\\w-]+$"
           },
           "routing": {
             "description": "Paths the default app forwards to this zone. Omit for a standalone app served on its own host.",
@@ -38,16 +39,22 @@
                   "items": {
                     "anyOf": [
                       {
-                        "type": "string"
+                        "type": "string",
+                        "format": "starts_with",
+                        "pattern": "^\\/.*"
                       },
                       {
                         "type": "object",
                         "properties": {
                           "source": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "starts_with",
+                            "pattern": "^\\/.*"
                           },
                           "destination": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "starts_with",
+                            "pattern": "^\\/.*"
                           }
                         },
                         "required": [

@@ -33,4 +33,5 @@ const nextBin = createRequire(join(process.cwd(), 'package.json')).resolve('next
 const child = spawn(process.execPath, [nextBin, command, '--port', port, ...rest], {
 	stdio: 'inherit',
 });
-child.on('exit', (code) => process.exit(code ?? 0));
+// `code` is null when Next is killed by a signal
+child.on('exit', (code) => process.exit(code ?? 1));
