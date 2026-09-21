@@ -8,8 +8,3 @@ export const rtlLocales: Locale[] = ["ar"];
 export function isRtl(locale: Locale): boolean {
   return rtlLocales.includes(locale);
 }
-
-export const zones = {
-  docs: "/docs",
-  blog: "/blog",
-} as const;
