@@ -1,12 +1,11 @@
 import { pathToRegexp } from 'path-to-regexp';
-import { getAssetPrefix, getApplications } from './config';
+import { getAssetPrefix, getChildApplications } from './config';
 
-const applications = getApplications();
+const childApplications = getChildApplications();
 
-const assetPrefixes = applications.map((app) => getAssetPrefix(app));
+const assetPrefixes = childApplications.map((app) => getAssetPrefix(app));
 
-const childZonePatterns = applications
-	.filter((app) => !app.default)
+const childZonePatterns = childApplications
 	.flatMap((app) => app.routing ?? [])
 	.flatMap((group) => group.paths)
 	.map((rule) => pathToRegexp(typeof rule === 'string' ? rule : rule.source));

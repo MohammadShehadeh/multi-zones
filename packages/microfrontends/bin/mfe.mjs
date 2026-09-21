@@ -30,6 +30,10 @@ if (command !== 'dev' && command !== 'start') {
 	process.exit(1);
 }
 
+if (app.development.host) {
+	console.log(`[mfe] ${name} → http://${app.development.host}:${port}`);
+}
+
 const nextBin = createRequire(join(process.cwd(), 'package.json')).resolve('next/dist/bin/next');
 const child = spawn(process.execPath, [nextBin, command, '--port', port, ...rest], {
 	stdio: 'inherit',

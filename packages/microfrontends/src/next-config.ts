@@ -50,12 +50,18 @@ function mergeRewrites(existing: Rewrites | undefined, zones: Rewrite[]) {
  * - default app: proxies every child zone's routes and assets via `beforeFiles` rewrites
  * - child app: serves its `_next` assets under its own `assetPrefix`;
  *   put zone-owned public files in `public/<assetPrefix>/` so they ride the same rewrite
+ * - standalone app (no `routing`): served on its own host, never proxied
  */
 export function withMicrofrontends(
 	nextConfig: NextConfig = {},
 	options: { appName?: string } = {},
 ): NextConfig {
 	const app = getApplication(options.appName ?? readPackageName());
+
+	if (!app.default && !app.routing) {
+		const allowedDevOrigins = [...(nextConfig.allowedDevOrigins ?? []), app.host];
+		return { ...nextConfig, allowedDevOrigins };
+	}
 
 	if (!app.default) {
 		return { ...nextConfig, assetPrefix: getAssetPrefix(app) };

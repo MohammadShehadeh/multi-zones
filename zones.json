@@ -35,6 +35,10 @@
       ],
       "development": { "local": 3002 },
       "production": { "url": "https://blog.example.internal" }
+    },
+    "dashboard": {
+      "development": { "local": 3003, "host": "dashboard.localhost" },
+      "production": { "url": "https://dashboard.example.com" }
     }
   }
 }

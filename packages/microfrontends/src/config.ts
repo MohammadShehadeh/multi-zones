@@ -11,7 +11,7 @@ export type ApplicationConfig = {
 	default?: boolean;
 	assetPrefix?: string;
 	routing?: RoutingGroup[];
-	development: { local: number };
+	development: { local: number; host?: string };
 	production: { url: string };
 };
 
@@ -21,6 +21,7 @@ export type MicrofrontendsConfig = {
 
 export type Application = ApplicationConfig & {
 	name: string;
+	host: string;
 	port: number;
 	url: string;
 };
@@ -44,11 +45,12 @@ function urlOverride(name: string) {
 
 function resolve(name: string, app: ApplicationConfig): Application {
 	const port = app.development.local;
+	const host = app.development.host ?? 'localhost';
 	const url =
 		urlOverride(name) ??
-		(isDevelopment() ? `http://localhost:${port}` : app.production.url);
+		(isDevelopment() ? `http://${host}:${port}` : app.production.url);
 
-	return { ...app, name, port, url: url.replace(/\/$/, '') };
+	return { ...app, name, host, port, url: url.replace(/\/$/, '') };
 }
 
 export function getApplications(): Application[] {
@@ -73,9 +75,13 @@ export function getDefaultApplication(): Application {
 	return app;
 }
 
-/** Child zones: every application that owns routes on the default app's domain. */
+/**
+ * Child zones: applications that own routes on the default app's domain.
+ * Apps without `routing` are standalone (own domain, e.g. `dashboard.localhost:3003`)
+ * and are never proxied by the default app.
+ */
 export function getChildApplications(): Application[] {
-	return getApplications().filter((a) => !a.default);
+	return getApplications().filter((a) => !a.default && a.routing);
 }
 
 export function getAssetPrefix(app: ApplicationConfig & { name: string }) {
