@@ -1,0 +1,29 @@
+{
+  "name": "@repo/microfrontends",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "mfe": "./bin/mfe.mjs"
+  },
+  "exports": {
+    "./config": "./src/config.ts",
+    "./next/config": "./src/next-config.ts",
+    "./next/proxy": "./src/proxy.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "path-to-regexp": "^6.3.0"
+  },
+  "peerDependencies": {
+    "next": "^15.0.0 || ^16.0.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.15.3",
+    "next": "16.2.0",
+    "typescript": "5.9.2"
+  }
+}

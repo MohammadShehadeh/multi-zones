@@ -1,6 +1,17 @@
-import { createI18nMiddleware } from "@repo/i18n/middleware";
+import { createI18nMiddleware } from '@repo/i18n/middleware';
+import { isZoneAssetPath } from '@repo/microfrontends/next/proxy';
+import type { NextRequest } from 'next/server';
 
-export const proxy = createI18nMiddleware();
+const i18nMiddleware = createI18nMiddleware();
+
+export function proxy(request: NextRequest) {
+  // This zone's _next assets live under its assetPrefix (see zones.json)
+  if (isZoneAssetPath(request.nextUrl.pathname)) {
+    return;
+  }
+
+  return i18nMiddleware(request);
+}
 
 export const config = {
   matcher: [
@@ -9,9 +20,8 @@ export const config = {
      * - api routes
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - blog-static (zone asset prefix)
      * - favicon and common image extensions
      */
-    '/((?!api|_next/static|_next/image|blog-static|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|bmp|tiff|avif)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\.(?:png|jpg|jpeg|gif|svg|webp|ico|bmp|tiff|avif)$).*)',
   ],
 };

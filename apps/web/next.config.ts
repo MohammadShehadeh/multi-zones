@@ -1,55 +1,9 @@
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
+import { withMicrofrontends } from '@repo/microfrontends/next/config';
 
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
-const DOCS_URL = process.env.DOCS_URL || 'http://localhost:3001';
-const BLOG_URL = process.env.BLOG_URL || 'http://localhost:3002';
+const nextConfig: NextConfig = {};
 
-const nextConfig: NextConfig = {
-	async rewrites() {
-		return {
-			beforeFiles: [
-				// Static asset proxying
-				{
-					source: "/docs-static/:path+",
-					destination: `${DOCS_URL}/docs-static/:path+`,
-				},
-				{
-					source: "/blog-static/:path+",
-					destination: `${BLOG_URL}/blog-static/:path+`,
-				},
-
-				// API routes — no locale prefix
-				{
-					source: "/docs/api/:path*",
-					destination: `${DOCS_URL}/api/:path*`,
-				},
-				{
-					source: "/blog/api/:path*",
-					destination: `${BLOG_URL}/api/:path*`,
-				},
-
-				// Locale-prefixed zone routes
-				{
-					source: "/:locale(en|ar)/docs",
-					destination: `${DOCS_URL}/:locale/docs`,
-				},
-				{
-					source: "/:locale(en|ar)/docs/:path*",
-					destination: `${DOCS_URL}/:locale/docs/:path*`,
-				},
-				{
-					source: "/:locale(en|ar)/blog",
-					destination: `${BLOG_URL}/:locale/blog`,
-				},
-				{
-					source: "/:locale(en|ar)/blog/:path*",
-					destination: `${BLOG_URL}/:locale/blog/:path*`,
-				},
-			],
-		};
-	},
-};
-
-export default withNextIntl(nextConfig);
+export default withNextIntl(withMicrofrontends(nextConfig));

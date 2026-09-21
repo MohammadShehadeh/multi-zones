@@ -2,6 +2,7 @@ import { setRequestLocale, getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import { locales, isRtl, type Locale } from "@repo/i18n/config";
+import { Button } from "./button";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -48,7 +49,7 @@ export default async function DocsLayout({
               <hr />
               <p style={{ fontSize: "0.75rem", color: "#999" }}>Zone: docs · Port 3001</p>
             </aside>
-            <main style={{ padding: "2rem", flex: 1 }}>{children}</main>
+            <main style={{ padding: "2rem", flex: 1 }}>{children} <Button /></main>
           </div>
         </NextIntlClientProvider>
       </body>

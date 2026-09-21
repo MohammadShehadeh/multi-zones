@@ -1,0 +1,40 @@
+{
+  "$schema": "./packages/microfrontends/schema.json",
+  "applications": {
+    "web": {
+      "default": true,
+      "development": { "local": 3000 },
+      "production": { "url": "https://example.com" }
+    },
+    "docs": {
+      "assetPrefix": "docs-static",
+      "routing": [
+        {
+          "group": "pages",
+          "paths": ["/:locale(en|ar)/docs", "/:locale(en|ar)/docs/:path*"]
+        },
+        {
+          "group": "api",
+          "paths": [{ "source": "/docs/api/:path*", "destination": "/api/:path*" }]
+        }
+      ],
+      "development": { "local": 3001 },
+      "production": { "url": "https://docs.example.internal" }
+    },
+    "blog": {
+      "assetPrefix": "blog-static",
+      "routing": [
+        {
+          "group": "pages",
+          "paths": ["/:locale(en|ar)/blog", "/:locale(en|ar)/blog/:path*"]
+        },
+        {
+          "group": "api",
+          "paths": [{ "source": "/blog/api/:path*", "destination": "/api/:path*" }]
+        }
+      ],
+      "development": { "local": 3002 },
+      "production": { "url": "https://blog.example.internal" }
+    }
+  }
+}

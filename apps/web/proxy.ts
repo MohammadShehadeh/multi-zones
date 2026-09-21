@@ -1,23 +1,12 @@
-import { createI18nMiddleware } from "@repo/i18n/middleware";
-import type { NextRequest } from "next/server";
+import { createI18nMiddleware } from '@repo/i18n/middleware';
+import { isMicrofrontendsPassthrough } from '@repo/microfrontends/next/proxy';
+import type { NextRequest } from 'next/server';
 
 const i18nMiddleware = createI18nMiddleware();
 
 export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  // Skip locale handling for zone static assets (rewrite handles them)
-  const zoneStaticPattern = /^\/(docs|blog)-static(\/|$)/;
-  // Skip locale handling for zone API routes (no locale in URL)
-  const zoneApiPattern = /^\/(docs|blog)\/api(\/|$)/;
-  // Skip locale handling for locale-prefixed zone routes (rewrite handles them)
-  const zonePrefixedPattern = /^\/(en|ar)\/(docs|blog)(\/|$)/;
-
-  if (
-    zoneStaticPattern.test(pathname) ||
-    zoneApiPattern.test(pathname) ||
-    zonePrefixedPattern.test(pathname)
-  ) {
+  // Zone routes and zone assets are rewritten to their app (see zones.json)
+  if (isMicrofrontendsPassthrough(request.nextUrl.pathname)) {
     return;
   }
 
@@ -33,6 +22,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon and common image extensions
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|bmp|tiff|avif)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\.(?:png|jpg|jpeg|gif|svg|webp|ico|bmp|tiff|avif)$).*)',
   ],
 };

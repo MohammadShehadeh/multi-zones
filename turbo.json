@@ -1,6 +1,8 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
+  "globalDependencies": ["zones.json"],
+  "globalEnv": ["MFE_*", "MICROFRONTENDS_ENV"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
