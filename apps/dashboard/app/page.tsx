@@ -1,7 +1,7 @@
-import { getApplication } from '@repo/microfrontends/config';
+import { getDefaultApplication } from '@repo/microfrontends/config';
 
 export default function DashboardPage() {
-	const web = getApplication('web');
+	const site = getDefaultApplication();
 
 	return (
 		<main style={{ padding: '2rem' }}>
@@ -12,7 +12,7 @@ export default function DashboardPage() {
 			</div>
 			<h1>Dashboard</h1>
 			<p>
-				<a href={web.url}>← Back to site</a>
+				<a href={site.url}>← Back to site</a>
 			</p>
 		</main>
 	);

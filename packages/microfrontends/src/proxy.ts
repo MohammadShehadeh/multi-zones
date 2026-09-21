@@ -1,31 +1,24 @@
 import { pathToRegexp } from 'path-to-regexp';
-import { getAssetPrefix, getChildApplications } from './config';
+import { getZoneApplications } from './config';
 
-const childApplications = getChildApplications();
+const zoneApplications = getZoneApplications();
 
-const assetPrefixes = childApplications.map((app) => getAssetPrefix(app));
+const assetPrefixes = zoneApplications.map((app) => app.assetPrefix);
 
-const childZonePatterns = childApplications
-	.flatMap((app) => app.routing ?? [])
-	.flatMap((group) => group.paths)
-	.map((rule) => pathToRegexp(typeof rule === 'string' ? rule : rule.source));
+const zonePathPatterns = zoneApplications
+	.flatMap((app) => app.routes)
+	.map((route) => pathToRegexp(route.source));
 
-/** Requests for any zone's `_next` assets (`/docs-static/...`). */
+/** Requests for any zone's `_next` assets or public files (`/docs-static/...`). */
 export function isZoneAssetPath(pathname: string) {
 	return assetPrefixes.some(
 		(prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
 	);
 }
 
-/** Requests the default app forwards to a child zone. */
-export function isChildZonePath(pathname: string) {
-	return childZonePatterns.some((pattern) => pattern.test(pathname));
-}
-
-/**
- * True when this app's own proxy logic (i18n, auth, ...) must not run:
- * zone assets, and — in the default app — routes owned by a child zone.
- */
-export function isMicrofrontendsPassthrough(pathname: string) {
-	return isZoneAssetPath(pathname) || isChildZonePath(pathname);
+/** Requests the default app rewrites to a zone: zone routes and zone assets. */
+export function isHandledByZone(pathname: string) {
+	return (
+		isZoneAssetPath(pathname) || zonePathPatterns.some((pattern) => pattern.test(pathname))
+	);
 }

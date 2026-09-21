@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Cross-platform `next dev|start` using the port from zones.json.
-// Usage: mfe dev | mfe start | mfe port   (run from an app directory)
+// Usage: mfe dev | mfe start   (run from an app directory)
 import { spawn } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -20,13 +20,8 @@ if (!app) {
 const port = String(app.development.local);
 const [command, ...rest] = process.argv.slice(2);
 
-if (command === 'port') {
-	console.log(port);
-	process.exit(0);
-}
-
 if (command !== 'dev' && command !== 'start') {
-	console.error('[mfe] usage: mfe <dev|start|port> [...next args]');
+	console.error('[mfe] usage: mfe <dev|start> [...next args]');
 	process.exit(1);
 }
 

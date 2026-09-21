@@ -1,89 +1,99 @@
+import { z } from 'zod';
 import raw from '../../../zones.json' with { type: 'json' };
+import { zonesConfigSchema, type ApplicationConfig } from './schema';
 
-export type PathRule = string | { source: string; destination: string };
-
-export type RoutingGroup = {
-	group?: string;
-	paths: PathRule[];
-};
-
-export type ApplicationConfig = {
-	default?: boolean;
-	assetPrefix?: string;
-	routing?: RoutingGroup[];
-	development: { local: number; host?: string };
-	production: { url: string };
-};
-
-export type MicrofrontendsConfig = {
-	applications: Record<string, ApplicationConfig>;
-};
-
-export type Application = ApplicationConfig & {
+interface ApplicationBase {
 	name: string;
 	host: string;
 	port: number;
 	url: string;
-};
-
-const config = raw as MicrofrontendsConfig;
-
-/**
- * Local ports in development, production URLs otherwise.
- * `MICROFRONTENDS_ENV=development` forces local URLs (e.g. `next build && next start` on your machine).
- */
-function isDevelopment() {
-	const override = process.env.MICROFRONTENDS_ENV;
-	if (override) return override === 'development';
-	return process.env.NODE_ENV !== 'production';
 }
 
-/** `MFE_DOCS_URL` overrides the URL of the `docs` app (staging, preview, CI). */
-function urlOverride(name: string) {
-	return process.env[`MFE_${name.toUpperCase().replace(/[^A-Z0-9]/g, '_')}_URL`];
+/** Owns the public domain and proxies every zone. */
+interface DefaultApplication extends ApplicationBase {
+	kind: 'default';
 }
 
-function resolve(name: string, app: ApplicationConfig): Application {
+/** A path the default app forwards to a zone; `source` uses Next.js rewrite syntax. */
+interface ZoneRoute {
+	source: string;
+	destination: string;
+}
+
+/** Serves routes on the default app's domain, proxied through it. */
+export interface ZoneApplication extends ApplicationBase {
+	kind: 'zone';
+	routes: ZoneRoute[];
+	assetPrefix: string;
+}
+
+/** Served on its own host (e.g. `dashboard.localhost:3003`), never proxied. */
+interface StandaloneApplication extends ApplicationBase {
+	kind: 'standalone';
+}
+
+type Application = DefaultApplication | ZoneApplication | StandaloneApplication;
+
+const parsed = zonesConfigSchema.safeParse(raw);
+if (!parsed.success) {
+	throw new Error(
+		`[microfrontends] Invalid zones.json\n${z.prettifyError(parsed.error)}`,
+	);
+}
+const config = parsed.data;
+
+// Local URLs in development, production URLs otherwise.
+// `MICROFRONTENDS_ENV=development` forces local URLs (e.g. `next build && next start` on your machine).
+const isDevelopment = process.env.MICROFRONTENDS_ENV
+	? process.env.MICROFRONTENDS_ENV === 'development'
+	: process.env.NODE_ENV !== 'production';
+
+function resolveApplication(name: string, app: ApplicationConfig): Application {
 	const port = app.development.local;
 	const host = app.development.host ?? 'localhost';
-	const url =
-		urlOverride(name) ??
-		(isDevelopment() ? `http://${host}:${port}` : app.production.url);
+	// `MFE_DOCS_URL` overrides the `docs` URL (staging, preview, CI)
+	const overrideUrl =
+		process.env[`MFE_${name.toUpperCase().replace(/[^A-Z0-9]/g, '_')}_URL`];
+	const url = (
+		overrideUrl ??
+		(isDevelopment ? `http://${host}:${port}` : app.production.url)
+	).replace(/\/$/, '');
+	const base = { name, host, port, url };
 
-	return { ...app, name, host, port, url: url.replace(/\/$/, '') };
+	if (app.default) return { ...base, kind: 'default' };
+	if (app.routing && app.assetPrefix) {
+		// A string path is forwarded unchanged
+		const routes = app.routing
+			.flatMap((group) => group.paths)
+			.map((path) => (typeof path === 'string' ? { source: path, destination: path } : path));
+		return { ...base, kind: 'zone', routes, assetPrefix: `/${app.assetPrefix}` };
+	}
+	return { ...base, kind: 'standalone' };
 }
 
-export function getApplications(): Application[] {
+function getApplications() {
 	return Object.entries(config.applications).map(([name, app]) =>
-		resolve(name, app),
+		resolveApplication(name, app),
 	);
 }
 
-export function getApplication(name: string): Application {
+export function getApplication(name: string) {
 	const app = config.applications[name];
 	if (!app) {
 		throw new Error(
 			`[microfrontends] Unknown application "${name}". Known: ${Object.keys(config.applications).join(', ')}`,
 		);
 	}
-	return resolve(name, app);
+	return resolveApplication(name, app);
 }
 
-export function getDefaultApplication(): Application {
-	const app = getApplications().find((a) => a.default);
-	if (!app) throw new Error('[microfrontends] No application marked "default": true');
+export function getDefaultApplication() {
+	const app = getApplications().find((a) => a.kind === 'default');
+	// Unreachable: zones.json validation requires exactly one default application
+	if (!app) throw new Error('[microfrontends] No default application');
 	return app;
 }
 
-/**
- * Child zones: applications that own routes on the default app's domain.
- * Apps without `routing` are standalone (own domain, e.g. `dashboard.localhost:3003`)
- * and are never proxied by the default app.
- */
-export function getChildApplications(): Application[] {
-	return getApplications().filter((a) => !a.default && a.routing);
-}
-
-export function getAssetPrefix(app: ApplicationConfig & { name: string }) {
-	return `/${app.assetPrefix ?? `${app.name}-static`}`;
+export function getZoneApplications() {
+	return getApplications().filter((app) => app.kind === 'zone');
 }

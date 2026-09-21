@@ -2,6 +2,7 @@ import Image from "next/image";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { buildMetadata } from "@repo/seo/metadata";
 import type { Locale } from "@repo/i18n/config";
+import { Link } from "@repo/microfrontends/next/link";
 
 export async function generateMetadata({
   params,
@@ -35,8 +36,8 @@ export default async function DocsIndexPage({
       <h1>{t("title")}</h1>
       <p>{t("description")}</p>
       <ul>
-        <li><a href={`/${locale}/docs/getting-started`}>Getting Started</a></li>
-        <li><a href={`/${locale}/docs/api-reference`}>API Reference</a></li>
+        <li><Link href={`/${locale}/docs/getting-started`}>Getting Started</Link></li>
+        <li><Link href={`/${locale}/docs/api-reference`}>API Reference</Link></li>
       </ul>
       <hr />
       <p style={{ fontSize: "0.85rem", color: "#666" }}>

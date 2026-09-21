@@ -1,12 +1,12 @@
 import { createI18nMiddleware } from '@repo/i18n/middleware';
-import { isMicrofrontendsPassthrough } from '@repo/microfrontends/next/proxy';
+import { isHandledByZone } from '@repo/microfrontends/next/proxy';
 import type { NextRequest } from 'next/server';
 
 const i18nMiddleware = createI18nMiddleware();
 
 export function proxy(request: NextRequest) {
-  // Zone routes and zone assets are rewritten to their app (see zones.json)
-  if (isMicrofrontendsPassthrough(request.nextUrl.pathname)) {
+  // Rewritten to the zone that owns it (see zones.json); the zone runs its own proxy
+  if (isHandledByZone(request.nextUrl.pathname)) {
     return;
   }
 
@@ -22,6 +22,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon and common image extensions
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\.(?:png|jpg|jpeg|gif|svg|webp|ico|bmp|tiff|avif)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|bmp|tiff|avif)$).*)',
   ],
 };

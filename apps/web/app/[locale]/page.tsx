@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Link } from "@repo/microfrontends/next/link";
 
 export default async function HomePage({
   params,
@@ -19,8 +20,8 @@ export default async function HomePage({
       <h1>{t("title")}</h1>
       <p>{t("description")}</p>
       <div style={{ marginTop: "1.5rem", display: "flex", gap: "1rem" }}>
-        <a href={`/${locale}/docs`} style={{ padding: "0.5rem 1rem", background: "#4f46e5", color: "white", borderRadius: "6px", textDecoration: "none" }}>Go to Docs →</a>
-        <a href={`/${locale}/blog`} style={{ padding: "0.5rem 1rem", background: "#059669", color: "white", borderRadius: "6px", textDecoration: "none" }}>Go to Blog →</a>
+        <Link href={`/${locale}/docs`} style={{ padding: "0.5rem 1rem", background: "#4f46e5", color: "white", borderRadius: "6px", textDecoration: "none" }}>Go to Docs →</Link>
+        <Link href={`/${locale}/blog`} style={{ padding: "0.5rem 1rem", background: "#059669", color: "white", borderRadius: "6px", textDecoration: "none" }}>Go to Blog →</Link>
       </div>
     </div>
   );

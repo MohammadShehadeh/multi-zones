@@ -2,6 +2,7 @@ import { setRequestLocale, getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import { locales, isRtl, type Locale } from "@repo/i18n/config";
+import { Link } from "@repo/microfrontends/next/link";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -26,14 +27,14 @@ export default async function BlogLayout({
       <body style={{ margin: 0, fontFamily: "sans-serif" }}>
         <NextIntlClientProvider messages={messages}>
           <nav style={{ display: "flex", gap: "1rem", padding: "1rem", borderBottom: "1px solid #eee", background: "#f0fdf4" }}>
-            <a href={`/${locale}`}>🏠 Home</a>
-            <a href={`/${locale}/docs`}>📖 Docs</a>
-            <a href={`/${locale}/blog`} style={{ fontWeight: "bold" }}>✍️ Blog</a>
+            <Link href={`/${locale}`}>🏠 Home</Link>
+            <Link href={`/${locale}/docs`}>📖 Docs</Link>
+            <Link href={`/${locale}/blog`} style={{ fontWeight: "bold" }}>✍️ Blog</Link>
             <span style={{ marginLeft: "auto" }}>
               {locales.map((l) => (
-                <a key={l} href={`/${l}/blog`} style={{ marginLeft: "0.5rem", fontWeight: l === locale ? "bold" : "normal" }}>
+                <Link key={l} href={`/${l}/blog`} style={{ marginLeft: "0.5rem", fontWeight: l === locale ? "bold" : "normal" }}>
                   {l.toUpperCase()}
-                </a>
+                </Link>
               ))}
             </span>
           </nav>

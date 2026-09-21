@@ -2,6 +2,7 @@ import Image from "next/image";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { buildMetadata } from "@repo/seo/metadata";
 import type { Locale } from "@repo/i18n/config";
+import { Link } from "@repo/microfrontends/next/link";
 
 export async function generateMetadata({
   params,
@@ -42,7 +43,7 @@ export default async function BlogIndexPage({
       <ul style={{ listStyle: "none", padding: 0 }}>
         {posts.map((post) => (
           <li key={post.slug} style={{ marginBottom: "1rem", padding: "1rem", border: "1px solid #eee", borderRadius: "6px" }}>
-            <a href={`/${locale}/blog/${post.slug}`}>{post.title}</a>
+            <Link href={`/${locale}/blog/${post.slug}`}>{post.title}</Link>
           </li>
         ))}
       </ul>

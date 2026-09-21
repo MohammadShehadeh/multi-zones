@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { locales, isRtl, type Locale } from '@repo/i18n/config';
 import { buildMetadata } from '@repo/seo/metadata';
 import { websiteJsonLd } from '@repo/seo/json-ld';
+import { Link } from '@repo/microfrontends/next/link';
 
 export function generateStaticParams() {
 	return locales.map((locale) => ({ locale }));
@@ -57,15 +58,15 @@ export default async function RootLayout({
 			<body>
 				<NextIntlClientProvider messages={messages}>
 					<nav style={{ display: 'flex', gap: '1rem', padding: '1rem', borderBottom: '1px solid #eee', background: '#f9f9f9' }}>
-						<a href={`/${locale}`} style={{ fontWeight: 'bold' }}>🏠 Home</a>
-						<a href={`/${locale}/about`}>About</a>
-						<a href={`/${locale}/docs`}>Docs</a>
-						<a href={`/${locale}/blog`}>Blog</a>
+						<Link href={`/${locale}`} style={{ fontWeight: 'bold' }}>🏠 Home</Link>
+						<Link href={`/${locale}/about`}>About</Link>
+						<Link href={`/${locale}/docs`}>Docs</Link>
+						<Link href={`/${locale}/blog`}>Blog</Link>
 						<span style={{ marginLeft: 'auto' }}>
 							{locales.map((l) => (
-								<a key={l} href={`/${l}`} style={{ marginLeft: '0.5rem', fontWeight: l === locale ? 'bold' : 'normal' }}>
+								<Link key={l} href={`/${l}`} style={{ marginLeft: '0.5rem', fontWeight: l === locale ? 'bold' : 'normal' }}>
 									{l.toUpperCase()}
-								</a>
+								</Link>
 							))}
 						</span>
 					</nav>

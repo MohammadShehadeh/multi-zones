@@ -9,20 +9,25 @@
   "exports": {
     "./config": "./src/config.ts",
     "./next/config": "./src/next-config.ts",
-    "./next/proxy": "./src/proxy.ts"
+    "./next/proxy": "./src/proxy.ts",
+    "./next/link": "./src/link.tsx"
   },
   "scripts": {
-    "check-types": "tsc --noEmit"
+    "generate:schema": "node scripts/generate-schema.mjs",
+    "check-types": "node scripts/generate-schema.mjs --check && tsc --noEmit"
   },
   "dependencies": {
-    "path-to-regexp": "^6.3.0"
+    "path-to-regexp": "^6.3.0",
+    "zod": "^4"
   },
   "peerDependencies": {
-    "next": "^15.0.0 || ^16.0.0"
+    "next": "^15.0.0 || ^16.0.0",
+    "react": "^19.0.0"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.15.3",
+    "@types/react": "19.2.2",
     "next": "16.2.0",
     "typescript": "5.9.2"
   }

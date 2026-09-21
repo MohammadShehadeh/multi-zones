@@ -1,38 +1,29 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { NextConfig } from 'next';
-import type { Rewrite } from 'next/dist/lib/load-custom-routes';
-import {
-	getApplication,
-	getAssetPrefix,
-	getChildApplications,
-	type Application,
-} from './config';
+import { z } from 'zod';
+import { getApplication, getZoneApplications, type ZoneApplication } from './config';
+import type { LinkRouting } from './link';
 
 type Rewrites = Awaited<ReturnType<NonNullable<NextConfig['rewrites']>>>;
+type Rewrite = Extract<Rewrites, unknown[]>[number];
+
+const packageJsonSchema = z.object({ name: z.string() });
 
 function readPackageName() {
-	const pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf8'));
-	return pkg.name as string;
+	const json: unknown = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf8'));
+	return packageJsonSchema.parse(json).name;
 }
 
-/** Destinations take bare params: `/:locale(en|ar)/docs` -> `/:locale/docs`. */
-function toDestination(path: string) {
-	return path.replace(/(:\w+)\([^)]*\)/g, '$1');
-}
-
-function zoneRewrites(app: Application): Rewrite[] {
-	const assetPrefix = getAssetPrefix(app);
-	const routes = (app.routing ?? []).flatMap((group) =>
-		group.paths.map((rule) => {
-			const { source, destination } =
-				typeof rule === 'string' ? { source: rule, destination: rule } : rule;
-			return { source, destination: `${app.url}${toDestination(destination)}` };
-		}),
-	);
+function zoneRewrites(app: ZoneApplication): Rewrite[] {
+	const routes = app.routes.map((route) => ({
+		source: route.source,
+		// Destinations take bare params: `/:locale(en|ar)/docs` -> `/:locale/docs`
+		destination: `${app.url}${route.destination.replace(/(:\w+)\([^)]*\)/g, '$1')}`,
+	}));
 
 	return [
-		{ source: `${assetPrefix}/:path*`, destination: `${app.url}${assetPrefix}/:path*` },
+		{ source: `${app.assetPrefix}/:path*`, destination: `${app.url}${app.assetPrefix}/:path*` },
 		...routes,
 	];
 }
@@ -44,35 +35,43 @@ function mergeRewrites(existing: Rewrites | undefined, zones: Rewrite[]) {
 }
 
 /**
- * Wires a Next.js app into the zones described in `zones.json`.
- * The app is identified by its package.json `name` (override with `appName`).
+ * Wires a Next.js app into `zones.json`; the app is identified by its package.json `name`.
  *
- * - default app: proxies every child zone's routes and assets via `beforeFiles` rewrites
- * - child app: serves its `_next` assets under its own `assetPrefix`;
+ * - default: proxies every zone's routes and assets via `beforeFiles` rewrites
+ * - zone: serves its `_next` assets under its `assetPrefix`;
  *   put zone-owned public files in `public/<assetPrefix>/` so they ride the same rewrite
- * - standalone app (no `routing`): served on its own host, never proxied
+ * - standalone: served on its own host, never proxied
+ *
+ * Every app gets `MICROFRONTENDS_LINK_ROUTING`, inlined at build time for `<Link>`.
  */
-export function withMicrofrontends(
-	nextConfig: NextConfig = {},
-	options: { appName?: string } = {},
-): NextConfig {
-	const app = getApplication(options.appName ?? readPackageName());
+export function withMicrofrontends(nextConfig: NextConfig = {}): NextConfig {
+	const app = getApplication(readPackageName());
+	const zoneApplications = getZoneApplications();
 
-	if (!app.default && !app.routing) {
-		const allowedDevOrigins = [...(nextConfig.allowedDevOrigins ?? []), app.host];
-		return { ...nextConfig, allowedDevOrigins };
-	}
-
-	if (!app.default) {
-		return { ...nextConfig, assetPrefix: getAssetPrefix(app) };
-	}
-
-	const zones = getChildApplications().flatMap(zoneRewrites);
-
-	return {
-		...nextConfig,
-		async rewrites() {
-			return mergeRewrites(await nextConfig.rewrites?.(), zones);
-		},
+	const linkRouting: LinkRouting = {
+		app: app.name,
+		zones: Object.fromEntries(
+			zoneApplications.map((zone) => [zone.name, zone.routes.map((route) => route.source)]),
+		),
 	};
+	const env = { ...nextConfig.env, MICROFRONTENDS_LINK_ROUTING: JSON.stringify(linkRouting) };
+
+	switch (app.kind) {
+		case 'standalone': {
+			const allowedDevOrigins = [...(nextConfig.allowedDevOrigins ?? []), app.host];
+			return { ...nextConfig, env, allowedDevOrigins };
+		}
+		case 'zone':
+			return { ...nextConfig, env, assetPrefix: app.assetPrefix };
+		case 'default': {
+			const rewrites = zoneApplications.flatMap(zoneRewrites);
+			return {
+				...nextConfig,
+				env,
+				async rewrites() {
+					return mergeRewrites(await nextConfig.rewrites?.(), rewrites);
+				},
+			};
+		}
+	}
 }
