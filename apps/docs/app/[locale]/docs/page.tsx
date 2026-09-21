@@ -2,7 +2,7 @@ import Image from "next/image";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { buildMetadata } from "@repo/seo/metadata";
 import type { Locale } from "@repo/i18n/config";
-import { Link } from "@repo/microfrontends/next/link";
+import { Link } from "@repo/microfrontends/next/client";
 
 export async function generateMetadata({
   params,

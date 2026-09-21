@@ -43,9 +43,9 @@ if (!parsed.success) {
 const config = parsed.data;
 
 // Local URLs in development, production URLs otherwise.
-// `MICROFRONTENDS_ENV=development` forces local URLs (e.g. `next build && next start` on your machine).
-const isDevelopment = process.env.MICROFRONTENDS_ENV
-	? process.env.MICROFRONTENDS_ENV === 'development'
+// `MFE_ENV=development` forces local URLs (e.g. `next build && next start` on your machine).
+const isDevelopment = process.env.MFE_ENV
+	? process.env.MFE_ENV === 'development'
 	: process.env.NODE_ENV !== 'production';
 
 function resolveApplication(name: string, app: ApplicationConfig): Application {

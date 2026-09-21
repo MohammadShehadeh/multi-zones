@@ -3,7 +3,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import { locales, isRtl, type Locale } from "@repo/i18n/config";
 import { Button } from "./button";
-import { Link } from "@repo/microfrontends/next/link";
+import { Link } from "@repo/microfrontends/next/client";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));

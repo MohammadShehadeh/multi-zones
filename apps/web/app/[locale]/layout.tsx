@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation';
 import { locales, isRtl, type Locale } from '@repo/i18n/config';
 import { buildMetadata } from '@repo/seo/metadata';
 import { websiteJsonLd } from '@repo/seo/json-ld';
-import { Link } from '@repo/microfrontends/next/link';
+import { Link } from '@repo/microfrontends/next/client';
 
 export function generateStaticParams() {
 	return locales.map((locale) => ({ locale }));

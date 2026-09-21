@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Link } from "@repo/microfrontends/next/link";
+import { Link } from "@repo/microfrontends/next/client";
 
 export default async function HomePage({
   params,

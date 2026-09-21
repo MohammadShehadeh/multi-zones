@@ -42,28 +42,30 @@ function mergeRewrites(existing: Rewrites | undefined, zones: Rewrite[]) {
  *   put zone-owned public files in `public/<assetPrefix>/` so they ride the same rewrite
  * - standalone: served on its own host, never proxied
  *
- * Every app gets `MICROFRONTENDS_LINK_ROUTING`, inlined at build time for `<Link>`.
+ * Every app also gets `NEXT_PUBLIC_MFE_LINK_ROUTING`, inlined at build time for `<Link>`.
  */
 export function withMicrofrontends(nextConfig: NextConfig = {}): NextConfig {
 	const app = getApplication(readPackageName());
-	const zoneApplications = getZoneApplications();
-
-	const linkRouting: LinkRouting = {
-		app: app.name,
-		zones: Object.fromEntries(
-			zoneApplications.map((zone) => [zone.name, zone.routes.map((route) => route.source)]),
-		),
-	};
-	const env = { ...nextConfig.env, MICROFRONTENDS_LINK_ROUTING: JSON.stringify(linkRouting) };
+	const withLinkRouting = (linkRouting: LinkRouting) => ({
+		...nextConfig.env,
+		NEXT_PUBLIC_MFE_LINK_ROUTING: JSON.stringify(linkRouting),
+	});
 
 	switch (app.kind) {
 		case 'standalone': {
 			const allowedDevOrigins = [...(nextConfig.allowedDevOrigins ?? []), app.host];
+			const env = withLinkRouting({ isZone: false, paths: [] });
 			return { ...nextConfig, env, allowedDevOrigins };
 		}
-		case 'zone':
+		case 'zone': {
+			const paths = app.routes.map((route) => route.source);
+			const env = withLinkRouting({ isZone: true, paths });
 			return { ...nextConfig, env, assetPrefix: app.assetPrefix };
+		}
 		case 'default': {
+			const zoneApplications = getZoneApplications();
+			const paths = zoneApplications.flatMap((zone) => zone.routes.map((route) => route.source));
+			const env = withLinkRouting({ isZone: false, paths });
 			const rewrites = zoneApplications.flatMap(zoneRewrites);
 			return {
 				...nextConfig,

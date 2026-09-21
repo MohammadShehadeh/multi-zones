@@ -10,7 +10,7 @@
     "./config": "./src/config.ts",
     "./next/config": "./src/next-config.ts",
     "./next/proxy": "./src/proxy.ts",
-    "./next/link": "./src/link.tsx"
+    "./next/client": "./src/link.tsx"
   },
   "scripts": {
     "generate:schema": "node scripts/generate-schema.mjs",
